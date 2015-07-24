@@ -1,5 +1,6 @@
 package com.example.steffen.test2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.view.MenuItem;
 
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -21,24 +23,28 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Intent myIntent = new Intent(this, Receiver.class);
+        this.startActivity(myIntent);
+
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint("http://fh-bingen.herokuapp.com/api/")
                 .build();
 
         TaskService service = restAdapter.create(TaskService.class);
 
-        service.createTask((new Task("Titel_Steffen", "Desc_Steffen")), (new Callback<Task>() {
-            @Override
-            public void success(Task task, Response response) {
-                Log.i("Gesendet", "True");
-            }
+        for (int i = 0; i < 2; i++) {
+            service.createTask((new Task("Titel_Steffen", "Desc_Steffen")), (new Callback<Task>() {
+                @Override
+                public void success(Task task, Response response) {
+                    Log.i("Gesendet", "True");
+                }
 
-            @Override
-            public void failure(RetrofitError error) {
-                Log.e("Gesendet", "False");
-            }
-        }));
-
+                @Override
+                public void failure(RetrofitError error) {
+                    Log.e("Gesendet", "False");
+                }
+            }));
+        }
  /*       service.deleteTask("Titel_Steffen", new Callback<Task>() {
 
             @Override
@@ -66,7 +72,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        service.getTask("gude", new Callback<Task>() {
+        service.getTask("Titel_Steffen", new Callback<Task>() {
 
             @Override
             public void success(Task task, Response response) {
@@ -97,6 +103,9 @@ public class MainActivity extends ActionBarActivity {
         });
 
 
+        Log.i("Event", "Start");
+        EventBus.getDefault().post(new MyEvent(23, 33));
+        Log.i("Event", "Stop");
 
     }
 
@@ -124,4 +133,7 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+
 }
